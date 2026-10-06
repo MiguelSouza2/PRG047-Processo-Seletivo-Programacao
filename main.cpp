@@ -26,9 +26,14 @@ int sum_blackjack(std::vector<std::string>& pdeck);
 std::string roulette_colored(int r);
 std::string draw_card(std::stack<std::string>& card_deck);
 float bal = 500.00f;
-std::vector<char> color = {'G','R','R','R','R','R','R','R','R','R','R','P','P',
-                               'P','P','P','P','P','P','R','R','R','R','R','R','R',
-                               'R','R','P','P','P','P','P','P','P','P'};
+
+std::vector<char> color = {
+    'G',
+    'R','P','R','P','R','P','R','P','R','P',
+    'P','R','P','R','P','R','P','R',
+    'R','P','R','P','R','P','R','P','R','P',
+    'R','P','R','P','R','P','R','P'
+};
 
 std::random_device rd;
 // gerador mt19937 iniciado com a seed
@@ -42,7 +47,7 @@ int main(){
         std::cout << "\n▪───────────────────────────────────────▪\n";
         std::cout << " Bem-vind@ ao cassino virtual CrossBETS!";
         std::cout << "\n▪───────────────────────────────────────▪\n";
-        std::cout << "[Saldo atual: R$ " << bal << "]\n\n";
+        std::cout << "[Saldo atual: " << bal << " TOKENS]\n\n";
         pause_screen();
         // escolha das opções
         // só tem a roleta por enquanto
@@ -57,14 +62,18 @@ int main(){
     } 
     return 0;
 }
+
 // LÓGICA ESTRITAMENTE DA ROLETA
 void roulette(float bet){
+    /* O jogador vai poder escolher entre 3 opções pra apostar, de acordo com o primeiro modelo de 
+    roleta que eu achei na internet (roleta europeia). Se 
+    */
     int opt, opt2, min, max=0;
     clear_screen();
     // receber o número apostado
     int user_num;
     // o usuário pode escolher entre o apostar em um número, grupo de número ou cor
-    std::cout << "\n¹²³ ROLETA ³²¹\nEscolha uma opção para apostar:\n[1] Número\n[2] Grupo de números\n[3] Cor";
+    std::cout << "\n¹²³ ROLETA ³²¹\nEscolha uma opção para apostar:\n[1] Número (35x a aposta)\n[2] Grupo (2x a aposta) de números\n[3] Cor\n";
     std::cin >> opt;
 
     switch(opt){
@@ -74,16 +83,18 @@ void roulette(float bet){
             if (!(std::cin >> user_num) || user_num <= 0 || user_num > 36) {
                 std::cout << "Número inválido! Aposta cancelada\n";
                 clear_buffer();
+                pause_screen();
                 return;
             }
             break;
         case 2:
         // caso seja um intervalo de números
-            std::cout << "Escolha um dos grupos para apostar:\n[1] 1-12\n[2] 13-24\n[3] 25-36";
+            std::cout << "Escolha um dos grupos para apostar:\n[1] 1-12\n[2] 13-24\n[3] 25-36\n";
             std::cin >> opt2;
             if(!std::cin || opt2 < 1 || opt2 > 3){
                 std::cout << "Grupo inválido! Aposta cancelada\n";
                 clear_buffer();
+                pause_screen();
                 return;
             }
             if(opt2==1) min=1, max=12;
@@ -91,7 +102,7 @@ void roulette(float bet){
             else min=25, max=36;
             break;
         case 3: 
-        // caso seja nas cores (acho que eh isso)
+        // caso seja nas cores (acho que é essa correspondência)
         // (0 é verde)
         // de 1 a 10 e 19 a 28, números pares são pretos e ímpares são vermelhos
         // de 11 a 18 e 29 a 36, números pares são vermelhos e ímpares são pretos
@@ -100,12 +111,14 @@ void roulette(float bet){
             if(!std::cin || (opt2!=1 && opt2 !=2)){
                 std::cout << "Cor inválida! Aposta cancelada\n";
                 clear_buffer();
+                pause_screen();
                 return;
             }
             break;
         default:
             std::cout << "Seleção inválida! Aposta cancelada\n";
             clear_buffer();
+            pause_screen();
             return;
         
     }
@@ -399,7 +412,7 @@ void calc_balance(float recalc){if(recalc != 0) bal+=recalc;}
 float bet(float bal){
     float bet;
     if(bal <= 0){
-            std::cout << "\nVocê está sem tokens! Fim de jogo.";
+            std::cout << "\nVocê está sem TOKENS! Fim de jogo.";
             std::exit(0);
         }
     while (true){   
