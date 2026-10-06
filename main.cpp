@@ -1,14 +1,11 @@
 #include <iostream>
 #include <random>
-#include <ctime>
 #include <thread>
 #include <cmath>
 #include <cstdlib>
 #include <limits>
-#include <format>
 #include <algorithm>
 #include <stack>
-#include <utility>
 #include <vector>
 
 void roulette();
@@ -18,16 +15,17 @@ void clear_buffer(), clear_screen();
 void pause_screen();
 void calc_balance(float recalc);
 void mysteryous_point(int it);
-void current_balance(float bal);
-float calc_bet(float bet);
+void current_balance(int bal);
+float calc_bet(int bet);
 
 int random_number(int min, int max);
 int sum_blackjack(std::vector<std::string>& pdeck);
 
 std::string roulette_colored(int r);
 std::string draw_card(std::stack<std::string>& card_deck);
-float bal = 100.00f;
+int bal = 100;
 
+// cores da roleta
 std::vector<char> color = {
     'G',
     'R','P','R','P','R','P','R','P','R','P',
@@ -36,12 +34,17 @@ std::vector<char> color = {
     'R','P','R','P','R','P','R','P'
 };
 
+// iniciando o gerador com a seed pra ter numeros aleatorios
 std::random_device rd;
-// gerador mt19937 iniciado com a seed
 std::mt19937 gen(rd());
 
 int main(){ 
     int opt = 0;
+    std::cout << "\n▪───────────────────────────────────────▪\n";
+    std::cout << "\nCassinos virtuais são proíbidos no Brasil!\nMesmo assim, aposte com responsabilidade :]\n";
+    std::cout << "\n▪───────────────────────────────────────▪\n";
+    mysteryous_point(8);
+    clear_screen();
     while(true){
         // introdução
         clear_screen();
@@ -343,19 +346,11 @@ void slot_machine(){
     char opt;
 
     clear_screen();
-    std::cout << "¹²³ CAÇA NÍQUEL ³²¹";
-    // lembrar o jogador do saldo atual
-    std::cout << "[D] Jogar\n[S] Parar de jogar\n";
-    std::cin >> opt;
-    if (!std::cin || (opt != 'S' && opt != 'D')) {
-        std::cout << "Opção inválida! Aposta cancelada\n";
-        clear_buffer();
-        return;
-    } 
+    std::cout << "¹²³ CAÇA NÍQUEL ³²¹\n";
     float bet = calc_bet(bal);
     // pra dar aquele efeito de cassino, vai ter um loop j pra fazer o efeito e outro para 
     // definir os números cada um 
-
+    std::cout << "\n▪────────────────────────▪\n";
     for(int i=0;i<3;i++){
         for (int j = 0; j < 15; j++){
             if(i==0) slots[0] = symbols[random_number(0, 2)];
@@ -366,7 +361,7 @@ void slot_machine(){
             std::this_thread::sleep_for(std::chrono::milliseconds(80)); 
         }
     }
-
+    std::cout << "\n▪────────────────────────▪\n";
     // verificar se os slots são simbolos iguais
     if(slots[0]==slots[1] && slots[0]==slots[2]){
         std::cout << "\nVOCÊ VENCEU!!";
@@ -428,11 +423,11 @@ void mysteryous_point(int it){
 
 void calc_balance(float recalc){if(recalc != 0) bal+=recalc;}
 
-void current_balance(float bal){
+void current_balance(int bal){
     std::cout << "[Saldo atual: " << bal << " TOKENS]\n\n";
 }
 
-float calc_bet(float bal){
+float calc_bet(int bal){
     float bet;
     if(bal <= 0){
             std::cout << "\nVocê está sem TOKENS! Fim de jogo.";
