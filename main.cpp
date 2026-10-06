@@ -11,21 +11,22 @@
 #include <utility>
 #include <vector>
 
-void roulette(float bet);
-void blackjack(float bet);
-void slot_machine(float bet);
+void roulette();
+void blackjack();
+void slot_machine();
 void clear_buffer(), clear_screen();
 void pause_screen();
 void calc_balance(float recalc);
 void mysteryous_point(int it);
-float bet(float bet);
+void current_balance(float bal);
+float calc_bet(float bet);
 
 int random_number(int min, int max);
 int sum_blackjack(std::vector<std::string>& pdeck);
 
 std::string roulette_colored(int r);
 std::string draw_card(std::stack<std::string>& card_deck);
-float bal = 500.00f;
+float bal = 100.00f;
 
 std::vector<char> color = {
     'G',
@@ -39,7 +40,7 @@ std::random_device rd;
 // gerador mt19937 iniciado com a seed
 std::mt19937 gen(rd());
 
-int main(){
+int main(){ 
     int opt = 0;
     while(true){
         // introdução
@@ -47,16 +48,15 @@ int main(){
         std::cout << "\n▪───────────────────────────────────────▪\n";
         std::cout << " Bem-vind@ ao cassino virtual CrossBETS!";
         std::cout << "\n▪───────────────────────────────────────▪\n";
-        std::cout << "[Saldo atual: " << bal << " TOKENS]\n\n";
-        pause_screen();
+        current_balance(bal);
         // escolha das opções
         // só tem a roleta por enquanto
         std::cout << "Escolha uma das 3 opções a seguir para continuar\n[1] Roleta\n[2] Blackjack\n[3] Caça-Níquel\n";
         std::cin >> opt;
         clear_buffer();
-        if (opt == 1) roulette(bet(bal));
-        else if (opt == 2) blackjack(bet(bal));
-        else if (opt == 3) slot_machine(bet(bal));
+        if (opt == 1) roulette();
+        else if (opt == 2) blackjack();
+        else if (opt == 3) slot_machine();
         else std::cout << "Opção inválida!\n";
         
     } 
@@ -64,7 +64,7 @@ int main(){
 }
 
 // LÓGICA ESTRITAMENTE DA ROLETA
-void roulette(float bet){
+void roulette(){
     /* O jogador vai poder escolher entre 3 opções pra apostar, de acordo com o primeiro modelo de 
     roleta que eu achei na internet (roleta europeia). Se 
     */
@@ -73,7 +73,9 @@ void roulette(float bet){
     // receber o número apostado
     int user_num;
     // o usuário pode escolher entre o apostar em um número, grupo de número ou cor
-    std::cout << "\n¹²³ ROLETA ³²¹\nEscolha uma opção para apostar:\n[1] Número (35x a aposta)\n[2] Grupo (2x a aposta) de números\n[3] Cor\n";
+    std::cout << "\n¹²³ ROLETA ³²¹\n";
+    float bet = calc_bet(bal);
+    std::cout << "Escolha uma opção para apostar:\n[1] Número (20x a aposta)\n[2] Grupo (2x a aposta) de números\n[3] Cor\n";
     std::cin >> opt;
 
     switch(opt){
@@ -138,7 +140,7 @@ void roulette(float bet){
     // lógica de vitória baseado no opt escolhido  
     if(opt==1 && drawn_num == user_num){
         std::cout << "Parabéns, você ganhou!";
-        calc_balance(10*bet);
+        calc_balance(20*bet);
     }else if(opt == 2 && drawn_num>=min && drawn_num <=max){
         std::cout << "Parabéns, você ganhou!";
         calc_balance(2*bet);
@@ -149,8 +151,15 @@ void roulette(float bet){
         std::cout << "Infelizmente você perdeu...";
         calc_balance(-bet);
     }
-    clear_buffer();
-    pause_screen();
+    std::cout << "\n\n"; 
+    int again;
+    std::cout << "Jogar de novo?\n[1] Sim\n[2] Não\n";
+    std::cin >> again;
+    if(again == 1){
+        roulette();
+    }else{
+        return;
+    }
 }
 
 std::string roulette_colored(int r){
@@ -169,7 +178,7 @@ std::string roulette_colored(int r){
 
 
 // LÓGICA ESTRITAMENTE DO BLACKJACK 
-void blackjack(float bet){
+void blackjack(){
     /* blackjack ou 21:
     o jogador e a casa vão receber duas cartas, das quais apenas uma da carta vai estar visível de primeira.
     O jogador poderá sacar mais uma carta ou parar. Se ele parar, a última carta da casa é revelada e vence quem estiver mais perto de 21.
@@ -207,15 +216,14 @@ void blackjack(float bet){
     house_cards.push_back(draw_card(card_deck)), house_cards.push_back(draw_card(card_deck));
 
     std::cout << "¹²³³ Blackjack ³²¹\n";
-    clear_buffer();
-    pause_screen();
+    float bet = calc_bet(bal);
     
     // enquanto o jogador não parar de jogar, as cartas da casa não serão reveladas ainda
     while(true){
         char opt; 
-        std::cout << "Distribuindo as cartas...\n";
+        std::cout << "\nDistribuindo as cartas...\n";
         mysteryous_point(3);
-        std::cout << "\n[Cartas da casa]\n{" << house_cards[0] << "} | {???}\n\n[Suas cartas]\n";
+        std::cout << "\n[Cartas da casa]\n{" << house_cards[0] << "} | {???}\n\n[Suas cartas]\n\n";
         // mostrar as cartas do jogador
         for(std::string i : player_cards){
             std::cout << "{"<< i <<"} ";
@@ -247,7 +255,7 @@ void blackjack(float bet){
     for(std::string i : player_cards){
         std::cout << "{"<< i <<"} ";
     }
-    std::cout << "Sua pontuação: " << player_sum;
+    std::cout << "\nSua pontuação: " << player_sum<<"\n";
     
     // revelar as casas da casa e comprar se faltar mais de 5 pontos
     std::cout << "\nCartas da casa: ";
@@ -268,7 +276,7 @@ void blackjack(float bet){
     // verificar quem tá mais próximo de 21 usando abs
     int abs_player = std::abs(21-player_sum);
     int abs_house = std::abs(21-house_sum);
-
+    std::cout << "\n\n";
     if(abs_player<abs_house){
         std::cout << "VOCÊ VENCEU!!";
         calc_balance(bet);
@@ -278,8 +286,15 @@ void blackjack(float bet){
     }else{
         std::cout << "FOI UM EMPATE!!";
     }
-    clear_buffer();
-    pause_screen();
+    std::cout << "\n\n"; 
+    int again;
+    std::cout << "Jogar de novo?\n[1] Sim\n[2] Não\n";
+    std::cin >> again;
+    if(again == 1){
+        blackjack();
+    }else{
+        return;
+    }
 }
 
 std::string draw_card(std::stack<std::string>& card_deck){
@@ -315,61 +330,65 @@ int sum_blackjack(std::vector<std::string>& pdeck) {
 }
 // ---
 
-
-void slot_machine(float bet){
+// LÓGICA ESTRITAMENTE DO CAÇA NIQUEL
+void slot_machine(){
     /* jogo 3:
-        Vai ter 3 símbolos aleatórios (🔔 🍒 💎) que serão sorteados e o objetivo do jogador é 
-        conseguir tirar 3 seguidos
-        A lógica é sortear um número de 0 a 2 em cada uma das 3 posições e verificar se são iguais 
-        no final
+    Vai ter 3 símbolos aleatórios (🔔 🍒 💎) que serão sorteados e o objetivo do jogador é 
+    conseguir tirar 3 seguidos
+    A lógica é sortear um número de 0 a 2 em cada uma das 3 posições e verificar se são iguais 
+    no final
     */
     std::vector<std::string>symbols = {"🔔","🍒","💎"};
     std::vector<std::string>slots(3);
     char opt;
 
     clear_screen();
-    std::cout << "¹²³ CAÇA NÍQUEL ³²¹\n[D] Jogar\n[S] Parar de jogar\n";
+    std::cout << "¹²³ CAÇA NÍQUEL ³²¹";
+    // lembrar o jogador do saldo atual
+    std::cout << "[D] Jogar\n[S] Parar de jogar\n";
     std::cin >> opt;
     if (!std::cin || (opt != 'S' && opt != 'D')) {
         std::cout << "Opção inválida! Aposta cancelada\n";
         clear_buffer();
         return;
+    } 
+    float bet = calc_bet(bal);
+    // pra dar aquele efeito de cassino, vai ter um loop j pra fazer o efeito e outro para 
+    // definir os números cada um 
+
+    for(int i=0;i<3;i++){
+        for (int j = 0; j < 15; j++){
+            if(i==0) slots[0] = symbols[random_number(0, 2)];
+            if(i<=1) slots[1] = symbols[random_number(0, 2)];
+            slots[2] = symbols[random_number(0, 2)];
+
+            std::cout << "\r [" << slots[0] << "] [" << slots[1] << "] [" << slots[2] << "]" << std::flush;
+            std::this_thread::sleep_for(std::chrono::milliseconds(80)); 
+        }
     }
 
-    if(opt == 'S'){
-        return;
+    // verificar se os slots são simbolos iguais
+    if(slots[0]==slots[1] && slots[0]==slots[2]){
+        std::cout << "\nVOCÊ VENCEU!!";
+        calc_balance(bet);
+    }
+    else{
+        std::cout << "\nVOCÊ PERDEU...";
+        calc_balance(-bet);
+    }
+    std::cout << "\n\n";
+    int again;
+    std::cout << "Jogar de novo?\n[1] Sim\n[2] Não\n";
+    std::cin >> again;
+    if(again == 1){
+        slot_machine();
     }else{
-        // pra dar aquele efeito de cassino, vai ter um loop j pra fazer o efeito e outro para 
-        // definir os números cada um 
-
-        for(int i=0;i<3;i++){
-            for (int j = 0; j < 15; j++){
-                if(i==0) slots[0] = symbols[random_number(0, 2)];
-                if(i<=1) slots[1] = symbols[random_number(0, 2)];
-                slots[2] = symbols[random_number(0, 2)];
-
-                std::cout << "\r [" << slots[0] << "] [" << slots[1] << "] [" << slots[2] << "]" << std::flush;
-                std::this_thread::sleep_for(std::chrono::milliseconds(80)); 
-            }
-        }
-
-        // verificar se os slots são simbolos iguais
-        if(slots[0]==slots[1] && slots[0]==slots[2]){
-            std::cout << "\nVOCÊ VENCEU!!";
-            calc_balance(bet);
-        }
-        else{
-            std::cout << "\nVOCÊ PERDEU...";
-            calc_balance(-bet);
-        }
-        clear_buffer();
-        pause_screen();
+        return;
     }
-
     
 
 }
-
+// ----
 
 int random_number(int min, int max){
     // distribuir os inteiros do minimo ao máximo
@@ -409,7 +428,11 @@ void mysteryous_point(int it){
 
 void calc_balance(float recalc){if(recalc != 0) bal+=recalc;}
 
-float bet(float bal){
+void current_balance(float bal){
+    std::cout << "[Saldo atual: " << bal << " TOKENS]\n\n";
+}
+
+float calc_bet(float bal){
     float bet;
     if(bal <= 0){
             std::cout << "\nVocê está sem TOKENS! Fim de jogo.";
